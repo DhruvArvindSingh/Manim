@@ -1,11 +1,11 @@
 import { GoogleGenAI } from "@google/genai";
+import socket from "./index.js";
 import dotenv from "dotenv";
-
 dotenv.config();
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-async function getLLMres(prompt: string) {
+async function getLLMres(prompt) {
     const response = await ai.models.generateContentStream({
         model: "gemini-2.0-flash",
         contents: `
@@ -49,6 +49,7 @@ Send the python code in such a manner that when it is pasted in a python file, i
         },
     });
     for await (const chunk of response) {
+        socket.emit("llm_response", chunk.text);
         console.log(chunk.text);
     }
 }
