@@ -9,10 +9,13 @@ const socket = io(process.env.SOCKET_SERVER_URL || "http://localhost:3001");
 console.log("Listening to socket server at", process.env.SOCKET_SERVER_URL || "http://localhost:3001");
 
 socket.emit("join_server", status);
-socket.on("work", (prompt) => {
+socket.on("work", async (prompt) => {
     status == "idle" ? status = "working" : status = "idle";
     socket.emit("update_status", status);
-    getLLMres(prompt);
+    await getLLMres(prompt);
+    console.log("Work completed");
+    status = "idle";
+    socket.emit("update_status", status);
 })
 
 export default socket;

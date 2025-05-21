@@ -16,7 +16,7 @@ console.log("Socket server is running on port", PORT);
 io.on("connection", (socket) => {
     console.log("a user connected");
     socket.on("join_server", (status: string) => {
-        console.log("join server called");
+        console.log("join server called with status:", status);
         status === "idle" ? idle_machine.push(socket.id) : working_machine.push(socket.id);
         if (work_queue.length > 0 && idle_machine.length > 0) {
             add_work(work_queue.pop());
@@ -26,6 +26,9 @@ io.on("connection", (socket) => {
         console.log("error called:", error);
     })
     socket.on("update_status", (status: string) => {
+        console.log("update status called with status:", status);
+        console.log("BEFORE idle machine:", idle_machine);
+        console.log("BEFORE working machine:", working_machine);
         if (status === "idle") {
             if (idle_machine.includes(socket.id) == false) {
                 idle_machine.push(socket.id);
@@ -45,9 +48,14 @@ io.on("connection", (socket) => {
                 idle_machine = idle_machine.filter(m => m !== socket.id);
             }
         }
+        console.log("AFTER idle machine:", idle_machine);
+        console.log("AFTER working machine:", working_machine);
     })
     socket.on("work_status", (status: string) => {
+        console.log("work status called with status:", status);
         let prompt: string = "";
+        console.log("BEFORE requested machine:", requested_machine);
+        console.log("BEFORE requested work:", requested_work);
         if (status === "accepted") {
             requested_machine = requested_machine.filter(m => m !== socket.id);
             requested_work = requested_work.filter(w => w.machine_id !== socket.id);
@@ -63,22 +71,31 @@ io.on("connection", (socket) => {
             });
             prompt && add_work(prompt);
         }
+        console.log("AFTER requested machine:", requested_machine);
+        console.log("AFTER requested work:", requested_work);
     })
 });
 
 function add_work(prompt: string) {
+    console.log("add work called with prompt:", prompt);
     if (idle_machine.length > 0) {
+        console.log("idle machine found, popping one with id:", idle_machine[idle_machine.length - 1]);
         let socket_id = idle_machine.pop();
+        console.log("socket id:", socket_id);
         if (socket_id) {
+
             requested_machine.push(socket_id);
+            console.log("requested machine:", requested_machine);
             requested_work.push({
                 "machine_id": socket_id,
                 "prompt": prompt,
             });
+            console.log("requested work:", requested_work);
             io.to(socket_id).emit("work", {
                 "machine_id": socket_id,
                 "prompt": prompt,
             });
+            console.log("work emitted to socket id:", socket_id);
         }
     }
     else {

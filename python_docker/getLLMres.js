@@ -1,5 +1,4 @@
 import { GoogleGenAI } from "@google/genai";
-import socket from "./index.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -49,7 +48,7 @@ Send the python code in such a manner that when it is pasted in a python file, i
         },
     });
     for await (const chunk of response) {
-        socket.emit("llm_response", chunk.text);
+
         console.log(chunk.text);
     }
 }
