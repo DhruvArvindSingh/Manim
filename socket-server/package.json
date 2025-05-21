@@ -12,6 +12,10 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@types/dotenv": "^6.1.1",
+    "@types/socket.io": "^3.0.1",
+    "dotenv": "^16.5.0",
+    "socket.io": "^4.8.1",
     "typescript": "^5.8.3"
   }
 }
