@@ -1,10 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
+import sendResponse from "./kafka/index.js";
 import dotenv from "dotenv";
 dotenv.config();
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-async function getLLMres(prompt) {
+async function getLLMres(prompt, slug) {
+    let chunkNo = 0;
     const response = await ai.models.generateContentStream({
         model: "gemini-2.0-flash",
         contents: `
@@ -45,10 +47,12 @@ Send the python code in such a manner that when it is pasted in a python file, i
         `,
         config: {
             temperature: 1,
+            min_tokens: 1000000,
+            max_tokens: 2000000,
         },
     });
     for await (const chunk of response) {
-
+        await sendResponse(chunk.text, slug, chunkNo++);
         console.log(chunk.text);
     }
 }

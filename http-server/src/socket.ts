@@ -15,11 +15,13 @@ console.log("Socket server is running on port", PORT);
 
 io.on("connection", (socket) => {
     console.log("a user connected");
+    socket.emit("rejoin_server");
     socket.on("join_server", (status: string) => {
         console.log("join server called with status:", status);
         status === "idle" ? idle_machine.push(socket.id) : working_machine.push(socket.id);
         if (work_queue.length > 0 && idle_machine.length > 0) {
-            add_work(work_queue.pop());
+            const w = work_queue.pop();
+            add_work(w.prompt, w.slug);
         }
     })
     socket.on("error", (error: Error) => {
@@ -37,7 +39,8 @@ io.on("connection", (socket) => {
                 working_machine = working_machine.filter(m => m !== socket.id);
             }
             if (work_queue.length > 0 && idle_machine.length > 0) {
-                add_work(work_queue.pop());
+                const w = work_queue.pop();
+                add_work(w.prompt, w.slug);
             }
         }
         else if (status === "working") {
@@ -54,6 +57,7 @@ io.on("connection", (socket) => {
     socket.on("work_status", (status: string) => {
         console.log("work status called with status:", status);
         let prompt: string = "";
+        let slug: string = "";
         console.log("BEFORE requested machine:", requested_machine);
         console.log("BEFORE requested work:", requested_work);
         if (status === "accepted") {
@@ -65,19 +69,29 @@ io.on("connection", (socket) => {
             requested_work = requested_work.filter(w => {
                 if (w.machine_id === socket.id) {
                     prompt = w.prompt;
+                    slug = w.slug;
                     return false;
                 }
                 return true;
             });
-            prompt && add_work(prompt);
+            prompt && slug && add_work(prompt, slug);
         }
         console.log("AFTER requested machine:", requested_machine);
         console.log("AFTER requested work:", requested_work);
     })
+    socket.on("disconnect", () => {
+        console.log("a user disconnected");
+        if (idle_machine.includes(socket.id)) {
+            idle_machine = idle_machine.filter(m => m !== socket.id);
+        }
+        if (working_machine.includes(socket.id)) {
+            working_machine = working_machine.filter(m => m !== socket.id);
+        }
+    })
 });
 
-function add_work(prompt: string) {
-    console.log("add work called with prompt:", prompt);
+function add_work(prompt: string, slug: string) {
+    console.log("add work called with prompt:", prompt, "and slug:", slug);
     if (idle_machine.length > 0) {
         console.log("idle machine found, popping one with id:", idle_machine[idle_machine.length - 1]);
         let socket_id = idle_machine.pop();
@@ -87,19 +101,23 @@ function add_work(prompt: string) {
             requested_machine.push(socket_id);
             console.log("requested machine:", requested_machine);
             requested_work.push({
+                "slug": slug,
                 "machine_id": socket_id,
                 "prompt": prompt,
             });
             console.log("requested work:", requested_work);
             io.to(socket_id).emit("work", {
-                "machine_id": socket_id,
                 "prompt": prompt,
+                "slug": slug,
             });
             console.log("work emitted to socket id:", socket_id);
         }
     }
     else {
-        work_queue.push(prompt);
+        work_queue.push({
+            "prompt": prompt,
+            "slug": slug,
+        });
     }
 }
 

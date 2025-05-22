@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import getLLMres from "./getLLMres.js";
+import { generateSlug } from 'random-word-slugs'
 import add_work from "./socket.js";
 
 dotenv.config();
@@ -10,9 +10,13 @@ const app = express();
 app.use(express.json());
 
 app.post("/llm", (req, res) => {
+    // const slug = generateSlug();
+    const slug = "test";
     console.log("LLM request received");
-    req.body.prompt != "" ? add_work(req.body.prompt) : res.status(400).send("Prompt is empty");
-    res.send("LLM response sent");
+    req.body.prompt != "" ? add_work(req.body.prompt, slug) : res.status(400).send("Prompt is empty");
+    res.send({
+        slug
+    });
 
 });
 
