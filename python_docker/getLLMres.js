@@ -7,13 +7,13 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 async function getLLMres(prompt, slug) {
     let chunkNo = 0;
+    let finalResponse = "";
     const response = await ai.models.generateContentStream({
         model: "gemini-2.0-flash",
         contents: `
 You are a great software engineer that can create videos using manim python library.
-You need to create a single python file which uses manim python library to create a video which has a main class with a method called main which when run create the whole video which satisfies the prompt given by the user.
-
-Your code will be saved directly to a file called 'a.py' in the root folder, so make sure it's a complete, runnable script.
+You need to create a single python file which uses manim python library to create a video which has a main class called "MainScene" which when run create the whole video which satisfies the prompt given by the user.
+Your code will be saved directly to a file called 'a.py ' in the root folder, so make sure it's a complete, runnable script.
 
 Include the main execution section at the end of your script like this:
 
@@ -25,7 +25,7 @@ if name == "main":
             "preview": True,
         }
     ):
-        scene = YourSceneClassName()
+        scene = MainScene()
         scene.construct()
 
 Send the python code in such a manner that when it is pasted in a python file, it runs without any errors and indentations are correct.
@@ -47,14 +47,16 @@ Send the python code in such a manner that when it is pasted in a python file, i
         `,
         config: {
             temperature: 1,
-            min_tokens: 1000000,
-            max_tokens: 2000000,
         },
     });
+
     for await (const chunk of response) {
         await sendResponse(chunk.text, slug, chunkNo++);
         console.log(chunk.text);
+        finalResponse += chunk.text;
     }
+    return finalResponse;
+
 }
 
 export default getLLMres;

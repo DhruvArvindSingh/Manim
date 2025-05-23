@@ -1,5 +1,6 @@
 import { io } from "socket.io-client";
 import getLLMres from "./getLLMres.js";
+import runPythonCode from "./runPythonCode.js";
 import dotenv from "dotenv";
 dotenv.config();
 let status = "idle";
@@ -18,7 +19,8 @@ socket.on("work", async ({ prompt, slug }) => {
         status = "working";
         socket.emit("update_status", status);
         socket.emit("work_status", "accepted");
-        await getLLMres(prompt, slug);
+        const response = await getLLMres(prompt, slug);
+        await runPythonCode(response, slug);
         console.log("Work completed");
         status = "idle";
         socket.emit("update_status", status);
