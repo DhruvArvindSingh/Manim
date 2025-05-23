@@ -28,11 +28,15 @@ async function initKafkaConsumer() {
         eachMessage: async ({ topic, partition, message }) => {
             // @ts-ignore
             const slug: string = await message.key!.toString();
-            console.log("\n\nmessage slug =", slug);
-            const { response, chunkNo } = JSON.parse(message.value?.toString() || "{}");
-            console.log("response =", response);
-            console.log("chunkNo =", chunkNo, "\n");
-            io.to(slug).emit("llm_response", { response, chunkNo });
+            console.log("Received message from Kafka", slug, message.value?.toString());
+
+            const payload = JSON.parse(message.value?.toString() || "{}");
+            if (payload.isStatus) {
+                io.to(slug).emit("project_status", { response: payload.response });
+            }
+            else {
+                io.to(slug).emit("llm_response", { response: payload.response, chunkNo: payload.chunkNo });
+            }
         },
     })
 }

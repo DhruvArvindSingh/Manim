@@ -2,6 +2,8 @@ import { io } from "socket.io-client";
 import getLLMres from "./getLLMres.js";
 import runPythonCode from "./runPythonCode.js";
 import dotenv from "dotenv";
+import sendResponse from "./kafka/index.js";
+
 dotenv.config();
 let status = "idle";
 console.log("GEMINI_API_KEY", process.env.GEMINI_API_KEY);
@@ -19,7 +21,10 @@ socket.on("work", async ({ prompt, slug }) => {
         status = "working";
         socket.emit("update_status", status);
         socket.emit("work_status", "accepted");
-        await getLLMres(prompt, slug);
+        const res = await getLLMres(prompt, slug);
+        console.log("LLM response =", res);
+        await sendResponse("Running code", slug, -1, true);
+        await runPythonCode(res, slug);
         console.log("Work completed");
         status = "idle";
         socket.emit("update_status", status);

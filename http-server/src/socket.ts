@@ -10,7 +10,12 @@ let work_queue: any[] = [];
 dotenv.config();
 
 const PORT = parseInt(process.env.SOCKET_SERVER_PORT || "3001");
-const io = new Server(PORT);
+const io = new Server(PORT, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    },
+});
 console.log("Socket server is running on port", PORT);
 
 io.on("connection", (socket) => {

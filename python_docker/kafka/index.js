@@ -26,15 +26,26 @@ try {
 } catch (error) {
     console.error('Error connecting to Kafka:', error)
 }
-async function sendResponse(response, slug, chunkNo) {
-
-    await producer.send({
-        topic: 'llm-response',
-        messages: [{
-            key: slug,
-            value: JSON.stringify({ response, slug, chunkNo })
-        }]
-    })
+async function sendResponse(response, slug, chunkNo, isStatus) {
+    console.log("Sending response to Kafka", response, slug, chunkNo, isStatus);
+    if (isStatus) {
+        await producer.send({
+            topic: 'llm-response',
+            messages: [{
+                key: slug,
+                value: JSON.stringify({ response, isStatus })
+            }]
+        })
+    }
+    else {
+        await producer.send({
+            topic: 'llm-response',
+            messages: [{
+                key: slug,
+                value: JSON.stringify({ response, chunkNo })
+            }]
+        })
+    }
 }
 
 export default sendResponse
