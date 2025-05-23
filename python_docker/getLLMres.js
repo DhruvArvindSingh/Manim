@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import sendResponse from "./kafka/index.js";
+import runPythonCode from "./runPythonCode.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -14,6 +15,7 @@ async function getLLMres(prompt, slug) {
 You are a great software engineer that can create videos using manim python library.
 You need to create a single python file which uses manim python library to create a video which has a main class called "MainScene" which when run create the whole video which satisfies the prompt given by the user.
 Your code will be saved directly to a file called 'a.py ' in the root folder, so make sure it's a complete, runnable script.
+Do not use external svg files.
 
 Include the main execution section at the end of your script like this:
 
@@ -55,7 +57,8 @@ Send the python code in such a manner that when it is pasted in a python file, i
         console.log(chunk.text);
         finalResponse += chunk.text;
     }
-    return finalResponse;
+    const res = await runPythonCode(finalResponse, slug);
+    return res;
 
 }
 

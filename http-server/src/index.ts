@@ -10,8 +10,8 @@ const app = express();
 app.use(express.json());
 
 app.post("/llm", (req, res) => {
-    // const slug = generateSlug();
-    const slug = "test";
+    const slug = new Date().getTime().toString() + "-" + generateSlug();
+    // const slug = "test";
     console.log("LLM request received");
     req.body.prompt != "" ? add_work(req.body.prompt, slug) : res.status(400).send("Prompt is empty");
     res.send({

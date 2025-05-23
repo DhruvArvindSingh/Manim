@@ -19,8 +19,7 @@ socket.on("work", async ({ prompt, slug }) => {
         status = "working";
         socket.emit("update_status", status);
         socket.emit("work_status", "accepted");
-        const response = await getLLMres(prompt, slug);
-        await runPythonCode(response, slug);
+        await getLLMres(prompt, slug);
         console.log("Work completed");
         status = "idle";
         socket.emit("update_status", status);
