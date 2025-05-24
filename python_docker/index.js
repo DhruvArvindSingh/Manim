@@ -27,21 +27,27 @@ socket.on("work", async ({ prompt, slug }) => {
 
         const res = await getLLMres(prompt, slug);
 
-        // await sendResponse("Running code", slug, -1, true);
+        await sendResponse("Running code", slug, -1, true);
 
         let isError = await runPythonCode(res, slug);
         if (isError != null) {
             console.log("Error occured in 1st iteration");
-            // await sendResponse("Error in running code.. solving error", slug, -1, true);
             while (isError != null) {
-                console.log("Error occured once again");
+                await sendResponse("Error in running code.. solving error", slug, -1, true);
                 const code = await solveErrorCode(isError, slug);
                 // console.log("Code =", code);
                 await deleteFiles();
                 isError = await runPythonCode(code, slug);
-                (isError) ? console.log("Error occured in again") : console.log("Error solved");
+                if (isError != null) {
+                    console.log("Error occured in again");
+                } else {
+                    await sendResponse("Error solved", slug, -1, true);
+                    break;
+                }
             }
+
             console.log("Uploading to S3");
+            await sendResponse("Uploading to cloud", slug, -1, true);
             const ress = await uploadToS3(slug);
             console.log("Uploaded to S3");
             await sendResponse("Broadcasting video", slug, -1, true);
@@ -53,6 +59,7 @@ socket.on("work", async ({ prompt, slug }) => {
 
             await new Promise(resolve => setTimeout(resolve, 1000));
             console.log("Uploading to S3");
+            await sendResponse("Uploading to cloud", slug, -1, true);
             const res = await uploadToS3(slug);
             console.log("Uploaded to S3");
             await sendResponse("Broadcasting video", slug, -1, true);

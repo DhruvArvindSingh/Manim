@@ -31,7 +31,10 @@ export function MainInterface() {
 
   const handleStatusMessage = async (data: any) => {
     console.log("data", data);
-    setProjectStatus(data.status);
+    setProjectStatus(data.response);
+    if (data.response == "Error in running code.. solving error") {
+      setPythonCode("");
+    }
     if (data.response == "Broadcasting video") {
       let video_status = false;
       while (!video_status) {
@@ -50,7 +53,7 @@ export function MainInterface() {
   const handleCodeMessage = (data: any) => {
     console.log("data", data);
     const { response, chunkNo } = data;
-    const code = response.replace("```python", "").replace("```", "").replace("python\n", "");
+    const code = response.replace("```python", "").replace("```", "").replace("python\n", "").replace("<code>", "").replace("</code>", "");
     setPythonCode((prev) => prev + code);
   }
 
@@ -199,6 +202,7 @@ export function MainInterface() {
                     ) : (
                       <div className="flex items-center justify-center h-full">
                         <Loader2 className="h-10 w-10 animate-spin" />
+                        <p>{projectStatus}...</p>
                       </div>
                     )}
                   </div>
