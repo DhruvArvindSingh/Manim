@@ -1,52 +1,100 @@
 "use client";
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { PromptInput } from '@/components/prompt-input';
 import { CodeDisplay } from '@/components/code-display';
 import { VideoPlayer } from '@/components/video-player';
 import { Button } from '@/components/ui/button';
+import axios from 'axios';
 import { Download, Sparkles, Code2, Video } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
+import dotenv from "dotenv";
+import io from "socket.io-client";
 
-type ResultState = {
-  pythonCode: string | null;
-  videoUrl: string | null;
-};
+dotenv.config();
 
+
+const socket = io(`${process.env.NEXT_PUBLIC_SOCKET_URL}`);
+let URL = "";
 export function MainInterface() {
+
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<ResultState>({
-    pythonCode: null,
-    videoUrl: null,
-  });
+  const [showVideo, setShowVideo] = useState(false);
+  const [projectStatus, setProjectStatus] = useState<string | null>(null);
+  const [pythonCode, setPythonCode] = useState<string>("");
+  const [slug, setSlug] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const handleStatusMessage = async (data: any) => {
+    console.log("data", data);
+    setProjectStatus(data.status);
+    if (data.response == "Broadcasting video") {
+      let video_status = false;
+      while (!video_status) {
+        const response = await axios.get(`${URL}`);
+        console.log("response", response);
+        if (response.status == 200) {
+          video_status = true;
+        }
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      }
+      setShowVideo(true);
+    }
+  }
+
+
+  const handleCodeMessage = (data: any) => {
+    console.log("data", data);
+    const { response, chunkNo } = data;
+    const code = response.replace("```python", "").replace("```", "").replace("python\n", "");
+    setPythonCode((prev) => prev + code);
+  }
+
+  useEffect(() => {
+    socket.on("llm_response", handleCodeMessage);
+    socket.on("project_status", handleStatusMessage);
+    return () => {
+      socket.off("llm_response", handleCodeMessage);
+      socket.off("project_status", handleStatusMessage);
+    }
+  }, []);
+
 
   const handleSubmit = async (prompt: string) => {
+    console.log("prompt", prompt);
     setIsLoading(true);
-
     try {
-      // Simulate API call to the backend
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Mock response from backend
-      const mockPythonCode = `from manim import *
-
-class CreateCircle(Scene):
-    def construct(self):
-        circle = Circle()  # create a circle
-        circle.set_fill(BLUE, opacity=0.5)  # set the color and transparency
-        self.play(Create(circle))  # show the circle on screen`;
-
-      // Mock video URL (would come from CloudFront in production)
-      const mockVideoUrl = "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4";
-
-      setResult({
-        pythonCode: mockPythonCode,
-        videoUrl: mockVideoUrl,
+      if (prompt == null || prompt == "") {
+        setIsLoading(false);
+        toast({
+          title: "Error",
+          description: "Please enter a prompt",
+        });
+        return;
+      }
+      console.log("process.env.NEXT_PUBLIC_API_URL", process.env.NEXT_PUBLIC_API_URL);
+      const response: any = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/llm`, {
+        "prompt": `${prompt}`,
+      }).catch((error) => {
+        console.log("Failed to talk to backend", error);
+        toast({
+          title: "Error",
+          description: "Failed to talk to backend",
+        });
+        return;
       });
-
-      setIsSubmitted(true);
+      if (response.status == 200) {
+        setIsSubmitted(true);
+        console.log("response.data", response.data);
+        setSlug(response.data.slug);
+        socket.emit("join_room", JSON.stringify({ "slug": `${response.data.slug}` }));
+        console.log("setting video url: ", `https://d1v9ua0rugj7lf.cloudfront.net/__main/${response.data.slug}.mp4`);
+        URL = `https://d1v9ua0rugj7lf.cloudfront.net/__main/${response.data.slug}.mp4`;
+        console.log("video url: ", URL);
+      }
     } catch (error) {
       console.error('Error submitting prompt:', error);
     } finally {
@@ -56,22 +104,21 @@ class CreateCircle(Scene):
 
   const handleReset = () => {
     setIsSubmitted(false);
-    setResult({
-      pythonCode: null,
-      videoUrl: null,
-    });
+    setPythonCode("");
+    // setVideoUrl("");
   };
 
   const handleDownload = () => {
-    if (result.videoUrl) {
+    if (URL) {
       const link = document.createElement('a');
-      link.href = result.videoUrl;
+      link.href = URL;
       link.download = 'manim-animation.mp4';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
   };
+
 
   return (
     <div className={cn(
@@ -129,7 +176,7 @@ class CreateCircle(Scene):
                 <h2 className="text-xl font-semibold">Generated Python Code</h2>
               </div>
               <Card className="h-[calc(100%-2rem)] overflow-hidden border-primary/20">
-                <CodeDisplay code={result.pythonCode || ''} className="min-h-[calc(100vh-16rem)]" />
+                <CodeDisplay code={pythonCode || ''} className="min-h-[calc(100vh-16rem)]" />
               </Card>
             </div>
             <div className="sticky bottom-4 bg-background/95 backdrop-blur pt-4">
@@ -143,10 +190,10 @@ class CreateCircle(Scene):
               <h2 className="text-xl font-semibold">Generated Animation</h2>
             </div>
             <Card className="flex-1 overflow-hidden border-primary/20">
-              {result.videoUrl && (
+              {URL && (
                 <>
                   <div className="h-[calc(100%-4rem)]">
-                    <VideoPlayer url={result.videoUrl} />
+                    <video src={URL} controls />
                   </div>
                   <div className="p-4 flex justify-between items-center border-t">
                     <Button onClick={handleReset} variant="outline" size="sm">

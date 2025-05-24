@@ -5,7 +5,12 @@ import consumer from "./kafka/index.js";
 initKafkaConsumer();
 dotenv.config();
 
-const io = new Server(parseInt(process.env.SOCKET_SERVER_PORT || "3002"));
+const io = new Server(parseInt(process.env.SOCKET_SERVER_PORT || "3002"), {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
 
 io.on("connection", (socket) => {
     console.log("a user connected");
