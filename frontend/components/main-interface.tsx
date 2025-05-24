@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import dotenv from "dotenv";
+import { Loader2 } from 'lucide-react';
 import io from "socket.io-client";
 
 dotenv.config();
@@ -193,7 +194,9 @@ export function MainInterface() {
               {URL && (
                 <>
                   <div className="h-[calc(100%-4rem)]">
-                    <video src={URL} controls />
+                    {showVideo ? <video src={URL} controls /> : <div className="flex items-center justify-center h-full">
+                      <Loader2 className="h-10 w-10 animate-spin" />
+                    </div>}
                   </div>
                   <div className="p-4 flex justify-between items-center border-t">
                     <Button onClick={handleReset} variant="outline" size="sm">

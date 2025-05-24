@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.52.0",
     "@aws-sdk/client-s3": "^3.816.0",
     "@google/genai": "^1.0.0",
     "dotenv": "^16.5.0",

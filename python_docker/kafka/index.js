@@ -27,7 +27,7 @@ try {
     console.error('Error connecting to Kafka:', error)
 }
 async function sendResponse(response, slug, chunkNo, isStatus) {
-    console.log("Sending response to Kafka", response, slug, chunkNo, isStatus);
+    // console.log("Sending response to Kafka", response, slug, chunkNo, isStatus);
     if (isStatus) {
         await producer.send({
             topic: 'llm-response',
