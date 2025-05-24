@@ -2,6 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide scrollbar for all elements */
+* {
+  -ms-overflow-style: none !important;
+  /* IE and Edge */
+  scrollbar-width: none !important;
+  /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+*::-webkit-scrollbar {
+  display: none !important;
+}
+
+html,
+body {
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
@@ -44,6 +66,7 @@
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -76,36 +99,47 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
 @keyframes moveLight1 {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(0, 0) scale(1);
   }
+
   25% {
     transform: translate(50vw, 25vh) scale(1.2);
   }
+
   50% {
     transform: translate(25vw, 50vh) scale(0.8);
   }
+
   75% {
     transform: translate(-25vw, 25vh) scale(1.1);
   }
 }
 
 @keyframes moveLight2 {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(0, 0) scale(1.2);
   }
+
   25% {
     transform: translate(-30vw, -20vh) scale(0.9);
   }
+
   50% {
     transform: translate(20vw, -40vh) scale(1.1);
   }
+
   75% {
     transform: translate(40vw, -10vh) scale(0.8);
   }

@@ -123,7 +123,7 @@ export function MainInterface() {
 
   return (
     <div className={cn(
-      "container flex max-w-screen-2xl flex-1 flex-col transition-all duration-300 ease-in-out",
+      "container flex max-w-[100vw] overflow-hidden flex-1 flex-col transition-all duration-300 ease-in-out h-screen scrollbar-hide",
       isSubmitted ? "pt-2" : "pt-8 md:pt-16"
     )}>
       {!isSubmitted ? (
@@ -169,15 +169,15 @@ export function MainInterface() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full min-h-[calc(100vh-4rem)]">
-          <div className="flex flex-col h-full">
-            <div className="flex-1 mb-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full h-[calc(100vh-6rem)] overflow-hidden">
+          <div className="flex flex-col h-full overflow-hidden">
+            <div className="flex-1 mb-4 overflow-hidden">
               <div className="flex items-center gap-2 mb-3">
                 <Code2 className="h-5 w-5 text-primary" />
                 <h2 className="text-xl font-semibold">Generated Python Code</h2>
               </div>
-              <Card className="h-[calc(100%-2rem)] overflow-hidden border-primary/20">
-                <CodeDisplay code={pythonCode || ''} className="min-h-[calc(100vh-16rem)]" />
+              <Card className="h-[calc(100%-3rem)] overflow-hidden border-primary/20">
+                <CodeDisplay code={pythonCode || ''} className="h-full" />
               </Card>
             </div>
             <div className="sticky bottom-4 bg-background/95 backdrop-blur pt-4">
@@ -185,7 +185,7 @@ export function MainInterface() {
             </div>
           </div>
 
-          <div className="flex flex-col h-full">
+          <div className="flex flex-col h-full overflow-hidden">
             <div className="flex items-center gap-2 mb-3">
               <Video className="h-5 w-5 text-primary" />
               <h2 className="text-xl font-semibold">Generated Animation</h2>
@@ -193,10 +193,14 @@ export function MainInterface() {
             <Card className="flex-1 overflow-hidden border-primary/20">
               {URL && (
                 <>
-                  <div className="h-[calc(100%-4rem)]">
-                    {showVideo ? <video src={URL} controls /> : <div className="flex items-center justify-center h-full">
-                      <Loader2 className="h-10 w-10 animate-spin" />
-                    </div>}
+                  <div className="h-[calc(100%-4rem)] flex items-center justify-center">
+                    {showVideo ? (
+                      <video src={URL} controls className="max-h-full w-full object-contain" />
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <Loader2 className="h-10 w-10 animate-spin" />
+                      </div>
+                    )}
                   </div>
                   <div className="p-4 flex justify-between items-center border-t">
                     <Button onClick={handleReset} variant="outline" size="sm">

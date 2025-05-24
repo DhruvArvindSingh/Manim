@@ -16,6 +16,7 @@ WORKDIR /app
 
 
 COPY __pycache__ __pycache__
+COPY utils utils
 COPY kafka kafka
 COPY kafka_auth kafka_auth
 COPY manim_env manim_env

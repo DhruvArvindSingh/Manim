@@ -21,12 +21,12 @@ export function CodeDisplay({ code, className }: CodeDisplayProps) {
   };
 
   return (
-    <Card className={cn("relative overflow-hidden", className)}>
+    <div className={cn("relative h-full", className)}>
       <div className="absolute right-2 top-2 z-10">
         <Button
           variant="secondary"
           size="icon"
-          className="h-8 w-8 rounded-md bg-background/80 hover:bg-background"
+          className="h-8 w-8 rounded-md bg-background/80 hover:bg-background backdrop-blur-sm"
           onClick={copyToClipboard}
         >
           {copied ? (
@@ -37,9 +37,11 @@ export function CodeDisplay({ code, className }: CodeDisplayProps) {
           <span className="sr-only">Copy code</span>
         </Button>
       </div>
-      <pre className="overflow-x-auto p-4 text-sm">
-        <code className="block whitespace-pre font-mono text-sm">{code}</code>
-      </pre>
-    </Card>
+      <div className="h-full overflow-y-auto overflow-x-hidden scrollbar-hide">
+        <pre className="p-4 text-sm">
+          <code className="block whitespace-pre font-mono language-python">{code}</code>
+        </pre>
+      </div>
+    </div>
   );
 }
