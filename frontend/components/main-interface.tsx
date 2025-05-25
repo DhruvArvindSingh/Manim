@@ -30,8 +30,8 @@ export function MainInterface() {
   const { toast } = useToast();
 
   const handleStatusMessage = async (data: any) => {
-    console.log("data", data);
-    setProjectStatus(data.response);
+    console.log("data.response", data.response);
+    (data.response.startsWith("{")) ? URL = JSON.parse(data.response).link : setProjectStatus(data.response);
     if (data.response == "Error in running code.. solving error") {
       setPythonCode("");
     }
@@ -211,8 +211,8 @@ export function MainInterface() {
                       New Animation
                     </Button>
                     <Button onClick={handleDownload} variant="default" size="sm">
-                      <Download className="mr-2 h-4 w-4" />
-                      Download Video
+                      <Download className="mr-2 h-4 w-4" />\
+                      <a href={URL}>Download Video</a>
                     </Button>
                   </div>
                 </>
