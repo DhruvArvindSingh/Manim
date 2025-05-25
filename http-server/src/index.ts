@@ -21,7 +21,17 @@ app.post("/llm", (req, res) => {
     res.send({
         slug
     });
+});
 
+app.post("/llm_rerun", (req, res) => {
+    const slug = new Date().getTime().toString() + "-" + generateSlug();
+    // const slug = "test1";
+    // const slug = "test";
+    console.log("LLM request received");
+    req.body.prompt != "" && req.body.code != "" ? add_work(JSON.stringify(req.body), slug, true) : res.status(400).send("Prompt or code is empty");
+    res.send({
+        slug
+    });
 });
 
 app.listen(PORT, () => {

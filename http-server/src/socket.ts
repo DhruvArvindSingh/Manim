@@ -95,7 +95,7 @@ io.on("connection", (socket) => {
     })
 });
 
-function add_work(prompt: string, slug: string) {
+function add_work(prompt: string, slug: string, rerun: boolean = false) {
     console.log("add work called with prompt:", prompt, "and slug:", slug);
     if (idle_machine.length > 0) {
         console.log("idle machine found, popping one with id:", idle_machine[idle_machine.length - 1]);
@@ -114,6 +114,7 @@ function add_work(prompt: string, slug: string) {
             io.to(socket_id).emit("work", {
                 "prompt": prompt,
                 "slug": slug,
+                "rerun": rerun,
             });
             console.log("work emitted to socket id:", socket_id);
         }

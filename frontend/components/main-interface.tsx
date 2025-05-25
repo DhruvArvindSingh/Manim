@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PromptInput } from '@/components/prompt-input';
 import { CodeDisplay } from '@/components/code-display';
-import { VideoPlayer } from '@/components/video-player';
 import { Button } from '@/components/ui/button';
 import axios from 'axios';
 import { Download, Sparkles, Code2, Video } from 'lucide-react';
@@ -24,6 +23,7 @@ export function MainInterface() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
   const [projectStatus, setProjectStatus] = useState<string | null>(null);
   const [pythonCode, setPythonCode] = useState<string>("");
   const [slug, setSlug] = useState<string | null>(null);
@@ -36,6 +36,7 @@ export function MainInterface() {
       setPythonCode("");
     }
     if (data.response == "Broadcasting video") {
+      setIsRunning(false);
       let video_status = false;
       while (!video_status) {
         const response = await axios.get(`${URL}`);
@@ -46,6 +47,19 @@ export function MainInterface() {
         await new Promise(resolve => setTimeout(resolve, 3000));
       }
       setShowVideo(true);
+    }
+    if (data.response == "Too many errors, giving up") {
+      setShowVideo(false);
+      setPythonCode("");
+      setSlug(null);
+      setTimeout(() => {
+        setIsRunning(false);
+        setIsSubmitted(false);
+      }, 1000);
+      toast({
+        title: "Error",
+        description: "Too many errors, giving up",
+      });
     }
   }
 
@@ -68,8 +82,17 @@ export function MainInterface() {
 
 
   const handleSubmit = async (prompt: string) => {
+    if (isRunning) {
+      toast({
+        title: "Error",
+        description: "Please wait for the current animation to finish",
+      });
+      return;
+    }
     console.log("prompt", prompt);
+    setIsRunning(true);
     setIsLoading(true);
+
     try {
       if (prompt == null || prompt == "") {
         setIsLoading(false);
@@ -80,16 +103,34 @@ export function MainInterface() {
         return;
       }
       console.log("process.env.NEXT_PUBLIC_API_URL", process.env.NEXT_PUBLIC_API_URL);
-      const response: any = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/llm`, {
-        "prompt": `${prompt}`,
-      }).catch((error) => {
-        console.log("Failed to talk to backend", error);
-        toast({
-          title: "Error",
-          description: "Failed to talk to backend",
+      let response: any;
+      if (pythonCode != "") {
+        response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/llm_rerun`, {
+          "prompt": `${prompt}`,
+          "code": `${pythonCode}`,
+        }).catch((error) => {
+          console.log("Failed to talk to backend", error);
+          toast({
+            title: "Error",
+            description: "Failed to talk to backend",
+          });
+          return;
         });
-        return;
-      });
+        setPythonCode("");
+        setShowVideo(false);
+        URL = "";
+      } else {
+        response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/llm`, {
+          "prompt": `${prompt}`,
+        }).catch((error) => {
+          console.log("Failed to talk to backend", error);
+          toast({
+            title: "Error",
+            description: "Failed to talk to backend",
+          });
+          return;
+        });
+      }
       if (response.status == 200) {
         setIsSubmitted(true);
         console.log("response.data", response.data);
@@ -106,20 +147,41 @@ export function MainInterface() {
     }
   };
 
+
   const handleReset = () => {
+    setIsRunning(false);
+    setShowVideo(false);
+    URL = "";
+    setProjectStatus(null);
+    setSlug(null);
     setIsSubmitted(false);
     setPythonCode("");
-    // setVideoUrl("");
   };
 
-  const handleDownload = () => {
-    if (URL) {
-      const link = document.createElement('a');
-      link.href = URL;
-      link.download = 'manim-animation.mp4';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+  const handleDownload = async () => {
+    if (slug) {
+      try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/get-signed-url/${slug}`);
+        if (response.data.signedUrl) {
+          const link = document.createElement('a');
+          link.href = response.data.signedUrl;
+          link.download = 'manim-animation.mp4';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to get download URL",
+          });
+        }
+      } catch (error) {
+        console.error('Error getting signed URL:', error);
+        toast({
+          title: "Error",
+          description: "Failed to get download URL",
+        });
+      }
     }
   };
 
@@ -210,10 +272,7 @@ export function MainInterface() {
                     <Button onClick={handleReset} variant="outline" size="sm">
                       New Animation
                     </Button>
-                    <Button onClick={handleDownload} variant="default" size="sm">
-                      <Download className="mr-2 h-4 w-4" />\
-                      <a href={URL}>Download Video</a>
-                    </Button>
+
                   </div>
                 </>
               )}

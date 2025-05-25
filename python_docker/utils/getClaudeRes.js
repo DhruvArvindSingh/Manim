@@ -1,12 +1,8 @@
-import { GoogleGenAI } from "@google/genai";
 import sendResponse from "../kafka/index.js";
-import getPrompt from "./getPrompt.js";
 import Anthropic from '@anthropic-ai/sdk';
 import dotenv from "dotenv";
 
 dotenv.config();
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const anthropic = new Anthropic({
     apiKey: `${process.env.CLAUDE_API_KEY}`, // defaults to process.env["ANTHROPIC_API_KEY"]
@@ -19,7 +15,7 @@ async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function getLLMres(prompt, slug, isError) {
+async function getClaudeRes(prompt, slug) {
     let chunkNo = 0;
     let isCode = false;
     let finalResponse = "";
@@ -31,12 +27,12 @@ async function getLLMres(prompt, slug, isError) {
 
             const msg = await anthropic.messages.stream({
                 model: "claude-3-5-sonnet-20240620",
-                max_tokens: 4096,
+                max_tokens: 3000,
                 stream: true,
                 temperature: 1,
                 messages: [{
                     role: "user",
-                    content: getPrompt(prompt, isError),
+                    content: `${prompt}`,
                 }],
             });
 
@@ -73,9 +69,9 @@ async function getLLMres(prompt, slug, isError) {
             }
 
             // If we've exhausted retries or it's a different error, throw it
-            throw error;
+            return null;
         }
     }
 }
 
-export default getLLMres;
+export default getClaudeRes;

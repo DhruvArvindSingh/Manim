@@ -9,9 +9,10 @@ async function runPythonCode(code, slug) {
     let stdoutMessages = [];
 
     try {
-        fs.writeFileSync(`a.py`, code.replace("```python", "").replace("```", ""));
+        fs.writeFileSync(`a.py`, code.replace("```python", "").replace("```", "").replace("<code>", "").replace("</code>", ""));
 
-        const process = exec(`manim_env/bin/python -m manim a.py MainScene -pqm -o MainVideo.mp4`);
+        // The -p flag in manim opens the video after rendering; remove it to prevent auto-opening.
+        const process = exec(`manim_env/bin/python -m manim a.py MainScene -qm -o MainVideo.mp4`);
 
         process.stdout.on('data', (data) => {
             console.log(data);
