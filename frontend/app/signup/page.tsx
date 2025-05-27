@@ -21,25 +21,25 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!name || !email || !password || !confirmPassword) {
       setError('All fields are required');
       return;
     }
-    
+
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
-    
+
     setIsLoading(true);
     setError('');
-    
+
     try {
       await signup(name, email, password);
       toast({
         title: "Account created",
-        description: "Welcome to Manim AI!",
+        description: "Welcome to Animath!",
       });
     } catch (err) {
       setError('Failed to create account');
@@ -62,7 +62,7 @@ export default function SignupPage() {
             Enter your information to create an account
           </p>
         </div>
-        
+
         <div className="grid gap-6">
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4">
@@ -77,7 +77,7 @@ export default function SignupPage() {
                   required
                 />
               </div>
-              
+
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -89,7 +89,7 @@ export default function SignupPage() {
                   required
                 />
               </div>
-              
+
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
                 <Input
@@ -100,7 +100,7 @@ export default function SignupPage() {
                   required
                 />
               </div>
-              
+
               <div className="grid gap-2">
                 <Label htmlFor="confirm-password">Confirm Password</Label>
                 <Input
@@ -111,14 +111,14 @@ export default function SignupPage() {
                   required
                 />
               </div>
-              
+
               {error && (
                 <div className="flex items-center gap-2 rounded-md bg-destructive/15 p-3 text-sm text-destructive">
                   <AlertCircle className="h-4 w-4" />
                   <p>{error}</p>
                 </div>
               )}
-              
+
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? (
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-background" />
@@ -129,7 +129,7 @@ export default function SignupPage() {
             </div>
           </form>
         </div>
-        
+
         <div className="text-center text-sm">
           Already have an account?{' '}
           <Link

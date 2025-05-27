@@ -56,9 +56,10 @@ Please analyze the error and provide a complete, corrected version of the code t
 1. Address the specific error message shown above
 2. Maintain all the original functionality
 3. Include all necessary imports and dependencies
-4. Ensure the code follows Manim best practices
-5. Return the complete, corrected code that can be run directly
-6. Always start the code with "<code>" and end the code with "</code>"
+4. Do not use external svg files and images(use manim shapes to replace assets).
+5. Ensure the code follows Manim best practices
+6. Return the complete, corrected code that can be run directly
+7. Always start the code with "<code>" and end the code with "</code>"
 
 Please respond with only the corrected code in a code block, no explanations needed.
 Dont add "Here's the corrected version of the code that addresses the syntax error and maintains all the original functionality:" at the beginning of the code.

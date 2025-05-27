@@ -65,6 +65,7 @@ socket.on("work", async ({ prompt, slug, rerun }) => {
                 }
                 // console.log("Code =", code);
                 await deleteFiles();
+                await sendResponse("Running code", slug, -1, true);
                 isError = await runPythonCode(code, slug);
                 if (isError != null) {
                     console.log("Error occured in again");

@@ -24,7 +24,7 @@ export function Header() {
               </div>
             </div>
             <span className="font-bold text-3xl tracking-tight sm:inline-block bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              Manim AI
+              Animath
             </span>
           </Link>
 

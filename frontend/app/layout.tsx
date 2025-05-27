@@ -8,8 +8,8 @@ import { Toaster } from '@/components/ui/toaster';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Manim AI - Create Videos Through Prompts',
-  description: 'Generate beautiful mathematical animations with natural language prompts using Manim',
+  title: 'Animath - Create Videos Through Prompts',
+  description: 'Generate beautiful mathematical animations with natural language prompts using Animath',
 };
 
 export default function RootLayout({

@@ -19,20 +19,20 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email || !password) {
       setError('Please enter both email and password');
       return;
     }
-    
+
     setIsLoading(true);
     setError('');
-    
+
     try {
       await login(email, password);
       toast({
         title: "Login successful",
-        description: "Welcome back to Manim AI!",
+        description: "Welcome back to Animath!",
       });
     } catch (err) {
       setError('Invalid email or password');
@@ -55,7 +55,7 @@ export default function LoginPage() {
             Enter your credentials to sign in to your account
           </p>
         </div>
-        
+
         <div className="grid gap-6">
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4">
@@ -70,7 +70,7 @@ export default function LoginPage() {
                   required
                 />
               </div>
-              
+
               <div className="grid gap-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
@@ -89,14 +89,14 @@ export default function LoginPage() {
                   required
                 />
               </div>
-              
+
               {error && (
                 <div className="flex items-center gap-2 rounded-md bg-destructive/15 p-3 text-sm text-destructive">
                   <AlertCircle className="h-4 w-4" />
                   <p>{error}</p>
                 </div>
               )}
-              
+
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? (
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-background" />
@@ -107,7 +107,7 @@ export default function LoginPage() {
             </div>
           </form>
         </div>
-        
+
         <div className="text-center text-sm">
           Don't have an account?{' '}
           <Link

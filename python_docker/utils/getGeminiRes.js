@@ -34,7 +34,7 @@ async function getGeminiRes(prompt, slug) {
             for await (const chunk of result) {
                 const chunkText = chunk.text;
                 if (chunkText == null || chunkText == "") continue;
-                console.log("Received chunk:", chunkText);
+                console.log("Received chunk: '", chunkText, "'");
 
                 finalResponse += chunkText;
 
@@ -43,7 +43,6 @@ async function getGeminiRes(prompt, slug) {
                     const cleanedCode = text
                         .replace("<code>", "")
                         .replace("</code>", "")
-                        .trim();
                     if (cleanedCode) {
                         await sendResponse(cleanedCode, slug, chunkNo++, true);
                     }
@@ -56,11 +55,11 @@ async function getGeminiRes(prompt, slug) {
                         if (part.includes("</code>")) {
                             const [code, rest] = part.split("</code>");
                             await handleCodePart(code);
-                            if (rest.trim()) {
-                                await sendResponse(rest.trim(), slug, chunkNo++, false);
-                            }
-                        } else if (part.trim()) {
-                            await sendResponse(part.trim(), slug, chunkNo++, false);
+                            // if (rest.trim()) {
+                            await sendResponse(rest, slug, chunkNo++, false);
+                            // }
+                        } else if (part) {
+                            await sendResponse(part, slug, chunkNo++, false);
                         }
                     }
                     continue;
@@ -70,8 +69,8 @@ async function getGeminiRes(prompt, slug) {
                 if (chunkText.includes("<code>")) {
                     isCode = true;
                     const [text, code] = chunkText.split("<code>");
-                    if (text.trim()) {
-                        await sendResponse(text.trim(), slug, chunkNo++, false);
+                    if (text) {
+                        await sendResponse(text, slug, chunkNo++, false);
                     }
                     codeBuffer = code || "";
                     continue;
@@ -84,8 +83,8 @@ async function getGeminiRes(prompt, slug) {
                     codeBuffer += code || "";
                     await handleCodePart(codeBuffer);
                     codeBuffer = ""; // Reset buffer
-                    if (text.trim()) {
-                        await sendResponse(text.trim(), slug, chunkNo++, false);
+                    if (text) {
+                        await sendResponse(text, slug, chunkNo++, false);
                     }
                     continue;
                 }
@@ -97,13 +96,13 @@ async function getGeminiRes(prompt, slug) {
                 }
 
                 // Handle regular text
-                if (chunkText.trim()) {
-                    await sendResponse(chunkText.trim(), slug, chunkNo++, false);
+                if (chunkText) {
+                    await sendResponse(chunkText, slug, chunkNo++, false);
                 }
             }
 
             // Handle any remaining code in buffer
-            if (codeBuffer.trim()) {
+            if (codeBuffer) {
                 await handleCodePart(codeBuffer);
             }
 

@@ -41,6 +41,7 @@ async function runPythonCode(code, slug) {
                 }
             });
             process.on('error', (err) => {
+                console.log("Error in running Python code:", err.message);
                 reject({
                     processError: err.message,
                     stderr: errorMessages.join('\n'),

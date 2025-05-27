@@ -190,7 +190,7 @@ export default function ExplorePage() {
                     </h1>
 
                     <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                        Discover a curated collection of mathematical animations created with Manim AI.
+                        Discover a curated collection of mathematical animations created with Animath.
                         From basic geometric shapes to complex mathematical visualizations.
                     </p>
                 </div>
@@ -385,7 +385,7 @@ export default function ExplorePage() {
                             Ready to Create Your Own?
                         </h3>
                         <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-                            Use Manim AI to generate custom mathematical animations from simple text descriptions.
+                            Use Animath to generate custom mathematical animations from simple text descriptions.
                             No coding experience required.
                         </p>
                         <Button size="lg" className="h-12 px-8 text-lg font-semibold">

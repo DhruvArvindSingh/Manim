@@ -206,7 +206,7 @@ export function MainInterface() {
               Create mathematical animations with AI
             </h1>
             <p className="mb-8 text-center text-muted-foreground text-lg md:text-xl">
-              Enter your prompt below and Manim AI will generate a Python code using Manim to create your animation.
+              Enter your prompt below and Animath will generate a Python code using Manim to create your animation.
             </p>
             <div className="max-w-3xl mx-auto">
               <PromptInput onSubmit={handleSubmit} isLoading={isLoading} />
