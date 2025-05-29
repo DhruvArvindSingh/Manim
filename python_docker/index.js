@@ -13,7 +13,7 @@ dotenv.config();
 let status = "idle";
 // console.log("GEMINI_API_KEY", process.env.GEMINI_API_KEY);
 
-const socket = io(process.env.SOCKET_SERVER_URL || "http://localhost:3001");
+const socket = io(process.env.SOCKET_SERVER_URL || "http://15.206.28.199:3031");
 console.log("Listening to socket server at", process.env.SOCKET_SERVER_URL || "http://localhost:3001");
 
 socket.on("rejoin_server", () => {
@@ -31,7 +31,7 @@ socket.on("work", async ({ prompt, slug, rerun }) => {
 
         let res = await getClaudeRes(getPrompt(prompt, false, rerun), slug);
         if (res == null || res == '') {
-            sendResponse("No response or tokens exhausted from Claude", slug, -1, true);
+            sendResponse("tokens exhausted from Claude trying Gemini", slug, -1, true);
             res = await getGeminiRes(getPrompt(prompt, false, rerun), slug);
             console.log("res", res);
         }
@@ -42,7 +42,7 @@ socket.on("work", async ({ prompt, slug, rerun }) => {
             return;
         }
 
-        await sendResponse("Running code", slug, -1, true);
+        await sendResponse("Running code might take few minutes", slug, -1, true);
 
         let isError = await runPythonCode(res, slug);
         if (isError != null) {
@@ -65,7 +65,7 @@ socket.on("work", async ({ prompt, slug, rerun }) => {
                 }
                 // console.log("Code =", code);
                 await deleteFiles();
-                await sendResponse("Running code", slug, -1, true);
+                await sendResponse("Running code might take few minutes", slug, -1, true);
                 isError = await runPythonCode(code, slug);
                 if (isError != null) {
                     console.log("Error occured in again");

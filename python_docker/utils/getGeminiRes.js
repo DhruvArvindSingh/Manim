@@ -25,7 +25,7 @@ async function getGeminiRes(prompt, slug) {
             console.log(`Attempt ${retryCount + 1} - LLM called with prompt: ${prompt}`);
 
             const result = await ai.models.generateContentStream({
-                model: "gemini-2.0-flash",
+                model: "gemini-2.5-flash-preview-05-20",
                 contents: `${prompt}`,
                 config: {
                     temperature: 1.0,

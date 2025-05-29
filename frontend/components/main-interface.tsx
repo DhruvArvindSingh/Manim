@@ -135,6 +135,7 @@ export function MainInterface() {
         setIsSubmitted(true);
         console.log("response.data", response.data);
         setSlug(response.data.slug);
+        setProjectStatus(response.data.status);
         socket.emit("join_room", JSON.stringify({ "slug": `${response.data.slug}` }));
         console.log("setting video url: ", `https://d1v9ua0rugj7lf.cloudfront.net/__main/${response.data.slug}.mp4`);
         URL = `https://d1v9ua0rugj7lf.cloudfront.net/__main/${response.data.slug}.mp4`;

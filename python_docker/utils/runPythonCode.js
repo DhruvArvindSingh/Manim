@@ -9,24 +9,85 @@ async function runPythonCode(code, slug) {
     let stdoutMessages = [];
 
     try {
-        fs.writeFileSync(`a.py`, code.replace("```python", "").replace("```", "").replace("<code>", "").replace("</code>", ""));
+        // Clean up the code by removing markdown and HTML tags
+        const cleanedCode = code
+            .replace(/```python/g, "")
+            .replace(/```/g, "")
+            .replace(/<code>/g, "")
+            .replace(/<\/code>/g, "")
+            .trim();
+
+        // Write the cleaned code to a file
+        console.log("Writing Python code to a.py");
+        fs.writeFileSync(`a.py`, cleanedCode);
+
+        // Log the Python version for debugging
+        console.log("Checking Python version...");
+        await new Promise((resolve) => {
+            const versionCheck = exec('python --version');
+            versionCheck.stdout.on('data', (data) => console.log("Python version:", data.trim()));
+            versionCheck.stderr.on('data', (data) => console.log("Python version error:", data.trim()));
+            versionCheck.on('close', resolve);
+        });
+
+        // Log if Manim is installed
+        console.log("Checking Manim installation...");
+        await new Promise((resolve) => {
+            const manimCheck = exec('python -c "import manim; print(f\'Manim version: {manim.__version__}\')"');
+            manimCheck.stdout.on('data', (data) => console.log(data.trim()));
+            manimCheck.stderr.on('data', (data) => console.log("Manim check error:", data.trim()));
+            manimCheck.on('close', resolve);
+        });
 
         // The -p flag in manim opens the video after rendering; remove it to prevent auto-opening.
-        const process = exec(`manim_env/bin/python -m manim a.py MainScene -qm -o MainVideo.mp4`);
+        console.log("Running Manim with command: python -m manim a.py MainScene -qm -o MainVideo.mp4");
+        let process;
+
+        try {
+            // Try the system Python first
+            process = exec(`python -m manim a.py MainScene -qm -o MainVideo.mp4`);
+        } catch (error) {
+            console.log("Failed to run with system Python, trying fallback paths:", error);
+
+            // Try fallback paths if system Python fails
+            const fallbackPaths = [
+                "python3 -m manim a.py MainScene -qm -o MainVideo.mp4",
+                "/usr/bin/python3 -m manim a.py MainScene -qm -o MainVideo.mp4",
+                "/usr/local/bin/python -m manim a.py MainScene -qm -o MainVideo.mp4",
+                "manim_env/bin/python -m manim a.py MainScene -qm -o MainVideo.mp4"
+            ];
+
+            for (const cmd of fallbackPaths) {
+                try {
+                    console.log(`Trying fallback command: ${cmd}`);
+                    process = exec(cmd);
+                    console.log("Fallback command started successfully");
+                    break; // Break the loop if successful
+                } catch (e) {
+                    console.log(`Fallback command ${cmd} failed:`, e);
+                    // Continue to the next fallback
+                }
+            }
+
+            if (!process) {
+                throw new Error("All Python execution attempts failed");
+            }
+        }
 
         process.stdout.on('data', (data) => {
-            console.log(data);
+            console.log("Manim stdout:", data);
             stdoutMessages.push(data);
         });
 
         process.stderr.on('data', (data) => {
-            console.log(data);
+            console.log("Manim stderr:", data);
             errorMessages.push(data);
         });
 
         // Convert event-based process completion to async/await
         await new Promise((resolve, reject) => {
             process.on('close', (code) => {
+                console.log(`Manim process exited with code ${code}`);
                 if (code === 0) {
                     resolve();
                 } else {
@@ -35,7 +96,7 @@ async function runPythonCode(code, slug) {
                         exitCode: code,
                         stderr: errorMessages.join('\n'),
                         stdout: stdoutMessages.join('\n'),
-                        pythonCode: code
+                        pythonCode: cleanedCode
                     };
                     reject(errorContext);
                 }
@@ -46,10 +107,12 @@ async function runPythonCode(code, slug) {
                     processError: err.message,
                     stderr: errorMessages.join('\n'),
                     stdout: stdoutMessages.join('\n'),
-                    pythonCode: code
+                    pythonCode: cleanedCode
                 });
             });
         });
+
+        console.log("Manim execution completed successfully");
         return null;
     } catch (err) {
         console.log("Error in running Python code:", err.exitCode || 'Process Error');

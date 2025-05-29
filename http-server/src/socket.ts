@@ -9,7 +9,7 @@ let work_queue: any[] = [];
 
 dotenv.config();
 
-const PORT = parseInt(process.env.SOCKET_SERVER_PORT || "3001");
+const PORT = parseInt(process.env.SOCKET_SERVER_PORT || "3031");
 const io = new Server(PORT, {
     cors: {
         origin: "*",
@@ -117,6 +117,7 @@ function add_work(prompt: string, slug: string, rerun: boolean = false) {
                 "rerun": rerun,
             });
             console.log("work emitted to socket id:", socket_id);
+            return "Assigned to machine"
         }
     }
     else {
@@ -124,6 +125,7 @@ function add_work(prompt: string, slug: string, rerun: boolean = false) {
             "prompt": prompt,
             "slug": slug,
         });
+        return "Added in Queue"
     }
 }
 
