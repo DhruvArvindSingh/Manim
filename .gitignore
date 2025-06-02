@@ -7,6 +7,7 @@ manim_env
 __pycache__
 media
 a.py
+.turbo
 cloudfront_auth
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
