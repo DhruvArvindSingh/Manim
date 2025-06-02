@@ -46,6 +46,7 @@ async function runPythonCode(code, slug) {
         try {
             // Try the system Python first
             process = exec(`python -m manim a.py MainScene -qm -o MainVideo.mp4`);
+            // process = exec(`manim_env/bin/python -m manim a.py MainScene -qm -o MainVideo.mp4`);
         } catch (error) {
             console.log("Failed to run with system Python, trying fallback paths:", error);
 

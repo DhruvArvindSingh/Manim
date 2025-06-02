@@ -38,7 +38,6 @@ async function getGeminiRes(prompt, slug) {
 
                 finalResponse += chunkText;
 
-                // Function to handle code part extraction and sending
                 const handleCodePart = async (text) => {
                     const cleanedCode = text
                         .replace("<code>", "")
@@ -48,7 +47,6 @@ async function getGeminiRes(prompt, slug) {
                     }
                 };
 
-                // Check for complete code blocks in a single chunk
                 if (chunkText.includes("<code>") && chunkText.includes("</code>")) {
                     const parts = chunkText.split("<code>");
                     for (let part of parts) {
@@ -65,7 +63,6 @@ async function getGeminiRes(prompt, slug) {
                     continue;
                 }
 
-                // Handle start of code block
                 if (chunkText.includes("<code>")) {
                     isCode = true;
                     const [text, code] = chunkText.split("<code>");
@@ -76,7 +73,6 @@ async function getGeminiRes(prompt, slug) {
                     continue;
                 }
 
-                // Handle end of code block
                 if (chunkText.includes("</code>")) {
                     isCode = false;
                     const [code, text] = chunkText.split("</code>");
@@ -89,19 +85,16 @@ async function getGeminiRes(prompt, slug) {
                     continue;
                 }
 
-                // Handle content within code block
                 if (isCode) {
                     codeBuffer += chunkText;
                     continue;
                 }
 
-                // Handle regular text
                 if (chunkText) {
                     await sendResponse(chunkText, slug, chunkNo++, false);
                 }
             }
 
-            // Handle any remaining code in buffer
             if (codeBuffer) {
                 await handleCodePart(codeBuffer);
             }
@@ -120,7 +113,6 @@ async function getGeminiRes(prompt, slug) {
                 continue;
             }
 
-            // If max retries reached, re-throw the error
             return null;
         }
     }
