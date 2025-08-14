@@ -1,23 +1,25 @@
 #!/bin/bash
 
-# Check if Manim is installed, install if not
-echo "Checking Manim installation..."
-if ! python -c "import manim" &> /dev/null; then
-    echo "Manim not found. Installing Manim..."
-    pip install manim
+# Check if virtual environment exists
+echo "Checking Manim virtual environment..."
+if [ ! -d "manim_env" ]; then
+    echo "Virtual environment not found. Creating one..."
+    python -m venv manim_env
+    manim_env/bin/pip install --upgrade pip
+    manim_env/bin/pip install manim
 fi
 
-# Verify Manim installation
+# Verify Manim installation in virtual environment
 echo "Verifying Manim installation..."
-python verify_manim.py
+manim_env/bin/python verify_manim.py
 
 if [ $? -ne 0 ]; then
     echo "Manim verification failed. Trying to reinstall..."
-    pip uninstall -y manim
-    pip install manim
+    manim_env/bin/pip uninstall -y manim
+    manim_env/bin/pip install manim
     
     # Verify again
-    python verify_manim.py
+    manim_env/bin/python verify_manim.py
     
     if [ $? -ne 0 ]; then
         echo "Manim installation failed after retry. Exiting."
@@ -27,7 +29,7 @@ fi
 
 # Run a test animation to ensure Manim works correctly
 echo "Running a test animation to verify Manim functionality..."
-python test_manim.py
+manim_env/bin/python test_manim.py
 
 if [ $? -ne 0 ]; then
     echo "Manim test animation failed. There might be issues with the rendering pipeline."

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S3 CORS Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        button {
+            padding: 10px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            min-height: 100px;
+        }
+
+        video {
+            max-width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>S3 CORS Test</h1>
+
+    <div>
+        <label for="videoUrl">S3 Video URL:</label>
+        <input type="text" id="videoUrl" style="width: 80%;"
+            value="https://manim-ai-bucket-1.s3.ap-south-1.amazonaws.com/__main/1754483622053-fat-lively-child.mp4">
+    </div>
+
+    <button id="testFetch">Test Fetch</button>
+    <button id="loadVideo">Load Video</button>
+
+    <div id="result">Results will appear here</div>
+
+    <div id="videoContainer"></div>
+
+    <script>
+        document.getElementById('testFetch').addEventListener('click', async () => {
+            const url = document.getElementById('videoUrl').value;
+            const resultDiv = document.getElementById('result');
+
+            resultDiv.innerHTML = 'Testing fetch to: ' + url + '<br>';
+
+            try {
+                const response = await fetch(url, { method: 'HEAD' });
+                resultDiv.innerHTML += `
+                    <div style="color: green">
+                        Success! Status: ${response.status}<br>
+                        Content-Type: ${response.headers.get('content-type')}<br>
+                        Content-Length: ${response.headers.get('content-length')} bytes
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML += `
+                    <div style="color: red">
+                        Error: ${error.message}<br>
+                        This likely means there's still a CORS issue.
+                    </div>
+                `;
+            }
+        });
+
+        document.getElementById('loadVideo').addEventListener('click', () => {
+            const url = document.getElementById('videoUrl').value;
+            const videoContainer = document.getElementById('videoContainer');
+            const resultDiv = document.getElementById('result');
+
+            resultDiv.innerHTML = 'Loading video from: ' + url + '<br>';
+
+            videoContainer.innerHTML = `
+                <video controls>
+                    <source src="${url}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            `;
+
+            const video = videoContainer.querySelector('video');
+
+            video.addEventListener('error', (e) => {
+                resultDiv.innerHTML += `
+                    <div style="color: red">
+                        Video load error: ${video.error.message || 'Unknown error'}<br>
+                        This likely means there's still a CORS issue or the video doesn't exist.
+                    </div>
+                `;
+            });
+
+            video.addEventListener('loadedmetadata', () => {
+                resultDiv.innerHTML += `
+                    <div style="color: green">
+                        Video loaded successfully!<br>
+                        Duration: ${video.duration.toFixed(2)} seconds<br>
+                        Resolution: ${video.videoWidth}x${video.videoHeight}
+                    </div>
+                `;
+            });
+        });
+    </script>
+</body>
+
+</html>

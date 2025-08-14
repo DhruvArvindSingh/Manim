@@ -21,6 +21,7 @@ async function main() {
                 methods: ["GET", "POST"]
             }
         });
+        console.log(`Socket.IO server started on port ${process.env.SOCKET_SERVER_PORT || "3002"}`);
 
         console.log(`Socket.IO server started on port ${process.env.SOCKET_SERVER_PORT || "3002"}`);
 

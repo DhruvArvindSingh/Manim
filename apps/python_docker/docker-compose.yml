@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  animath-python:
+    build: .
+    container_name: animath-python-service
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      - SOCKET_SERVER_URL=http://localhost:3031
+    volumes:
+      - ./logs:/app/logs  # Optional: for persistent logs
+      - ./media:/app/media  # For Manim video output
+    healthcheck:
+      test: ["CMD", "node", "-e", "console.log('health check')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

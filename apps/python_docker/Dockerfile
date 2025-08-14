@@ -47,6 +47,10 @@ COPY package*.json .
 COPY main.sh main.sh
 COPY verify_manim.py verify_manim.py
 COPY test_manim.py test_manim.py
+# Create a virtual environment for Manim
+RUN python -m venv manim_env && \
+    manim_env/bin/pip install --upgrade pip && \
+    manim_env/bin/pip install manim
 
 RUN npm install
 RUN chmod +x main.sh

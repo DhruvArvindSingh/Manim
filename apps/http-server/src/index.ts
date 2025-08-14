@@ -8,9 +8,18 @@ dotenv.config();
 const PORT = process.env.HTTP_PORT || 3000;
 const app = express();
 
-app.use(cors());
+// CORS configuration
+app.use(cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
+}));
 
 app.use(express.json());
+
+// Handle preflight requests for specific routes
+app.options('/llm', cors());
+app.options('/llm_rerun', cors());
 
 app.post("/llm", (req, res) => {
     const slug = new Date().getTime().toString() + "-" + generateSlug();

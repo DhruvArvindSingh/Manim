@@ -30,49 +30,53 @@ async function runPythonCode(code, slug) {
             versionCheck.on('close', resolve);
         });
 
-        // Log if Manim is installed
+        // Check Manim installation using virtual environment
         console.log("Checking Manim installation...");
         await new Promise((resolve) => {
-            const manimCheck = exec('python -c "import manim; print(f\'Manim version: {manim.__version__}\')"');
-            manimCheck.stdout.on('data', (data) => console.log(data.trim()));
+            const manimCheck = exec('manim_env/bin/manim --version');
+            manimCheck.stdout.on('data', (data) => console.log("Manim version:", data.trim()));
             manimCheck.stderr.on('data', (data) => console.log("Manim check error:", data.trim()));
-            manimCheck.on('close', resolve);
+            manimCheck.on('close', (code) => {
+                if (code !== 0) {
+                    console.log("Warning: Virtual env Manim check failed. Will try alternative paths.");
+                }
+                resolve();
+            });
         });
 
         // The -p flag in manim opens the video after rendering; remove it to prevent auto-opening.
         console.log("Running Manim with command");
         let process;
 
-        try {
-            // Try manim_env first (direct Python path - no source needed)
-            console.log("Trying manim_env/bin/python...");
-            process = exec(`manim_env/bin/python -m manim a.py MainScene -qm -o MainVideo.mp4`);
-        } catch (error) {
-            console.log("Failed to run with manim_env, trying fallback paths:", error);
+        // Try Manim execution paths in order of preference
+        // Priority: Use the virtual environment manim executable
+        const manimPaths = [
+            "manim_env/bin/manim a.py MainScene -qm -o MainVideo.mp4",                // Virtual env manim (primary)
+            "manim_env/bin/python -m manim a.py MainScene -qm -o MainVideo.mp4",      // Virtual env python module
+            "manim a.py MainScene -qm -o MainVideo.mp4",                              // Global manim (fallback)
+            "python -m manim a.py MainScene -qm -o MainVideo.mp4",                    // Python module (fallback)
+            "python3 -m manim a.py MainScene -qm -o MainVideo.mp4",                   // Python3 module (fallback)
+            "/usr/local/bin/python3 -m manim a.py MainScene -qm -o MainVideo.mp4",    // Docker installed python3
+            "/usr/bin/python3 -m manim a.py MainScene -qm -o MainVideo.mp4"           // System python3
+        ];
 
-            // Try fallback paths if manim_env Python fails
-            const fallbackPaths = [
-                "python -m manim a.py MainScene -qm -o MainVideo.mp4",
-                "python3 -m manim a.py MainScene -qm -o MainVideo.mp4",
-                "/usr/bin/python3 -m manim a.py MainScene -qm -o MainVideo.mp4",
-                "/usr/local/bin/python -m manim a.py MainScene -qm -o MainVideo.mp4"
-            ];
+        let lastError;
 
-            for (const cmd of fallbackPaths) {
-                try {
-                    console.log(`Trying fallback command: ${cmd}`);
-                    process = exec(cmd);
-                    console.log("Fallback command started successfully");
-                    break; // Break the loop if successful
-                } catch (e) {
-                    console.log(`Fallback command ${cmd} failed:`, e);
-                    // Continue to the next fallback
-                }
+        for (const cmd of manimPaths) {
+            try {
+                console.log(`Trying command: ${cmd}`);
+                process = exec(cmd);
+                console.log("Command started successfully");
+                break; // Break the loop if successful
+            } catch (e) {
+                console.log(`Command ${cmd} failed:`, e);
+                lastError = e;
+                // Continue to the next command
             }
+        }
 
-            if (!process) {
-                throw new Error("All Python execution attempts failed");
-            }
+        if (!process) {
+            throw new Error(`All Python execution attempts failed. Last error: ${lastError?.message || 'Unknown error'}`);
         }
 
         process.stdout.on('data', (data) => {

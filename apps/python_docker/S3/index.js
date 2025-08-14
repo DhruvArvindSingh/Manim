@@ -3,14 +3,18 @@ import { PutObjectCommand } from '@aws-sdk/client-s3';
 import fs from 'fs';
 import path from "path";
 import mime from 'mime';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 const __dirname = path.resolve();
 
 const s3Client = new S3Client({
     region: 'ap-south-1',
     credentials: {
-        accessKeyId: `${process.env.S3_ACCESS_KEY}`,
-        secretAccessKey: `${process.env.S3_SECRET_KEY}`,
+        accessKeyId: process.env.S3_ACCESS_KEY,
+        secretAccessKey: process.env.S3_SECRET_KEY,
     },
 });
 
