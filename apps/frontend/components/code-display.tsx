@@ -37,9 +37,9 @@ export function CodeDisplay({ code, className }: CodeDisplayProps) {
           <span className="sr-only">Copy code</span>
         </Button>
       </div>
-      <div className="h-full overflow-y-auto overflow-x-auto scrollbar-hide">
+      <div className="h-full overflow-y-auto overflow-x-auto code-scroll">
         <pre className="p-4 text-sm min-w-max">
-          <code className="block whitespace-pre font-mono language-python">{code}</code>
+          <code className="block whitespace-pre font-mono language-python leading-relaxed text-foreground">{code}</code>
         </pre>
       </div>
     </div>

@@ -7,7 +7,7 @@ import { Header } from '@/components/header';
 
 export default function Home() {
   console.log("process.env.NEXT_PUBLIC_API_URL", process.env.NEXT_PUBLIC_API_URL);
-  console.log("process.env.NEXT_PUBLIC_SOCKET_SERVER_URL", process.env.NEXT_PUBLIC_SOCKET_SERVER_URL);
+  console.log("process.env.NEXT_PUBLIC_SOCKET_URL", process.env.NEXT_PUBLIC_SOCKET_URL);
 
   const router = useRouter();
 

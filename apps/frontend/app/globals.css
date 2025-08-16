@@ -2,8 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Hide scrollbar for all elements */
-* {
+/* Hide scrollbar for specific elements with scrollbar-hide class */
+.scrollbar-hide {
   -ms-overflow-style: none !important;
   /* IE and Edge */
   scrollbar-width: none !important;
@@ -11,8 +11,18 @@
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
-*::-webkit-scrollbar {
+.scrollbar-hide::-webkit-scrollbar {
   display: none !important;
+}
+
+/* Additional scrollbar hiding for code display */
+.code-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.code-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 html,
