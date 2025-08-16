@@ -1,84 +1,75 @@
-# Turborepo starter
+# Animath: AI-Powered Mathematical Animations
 
-This Turborepo starter is maintained by the Turborepo core team.
+Animath is a cutting-edge platform that transforms mathematical concepts into stunning, high-quality animations using the power of artificial intelligence. Simply describe the animation you want, and watch as Animath generates the code and renders a beautiful visualization.
 
-## Using this example
+## ✨ Features
 
-Run the following command:
+- **AI-Powered Animation**: Describe mathematical concepts in natural language and watch them come to life.
+- **Real-time Rendering**: See your animations rendered in real-time with high-quality output.
+- **Code Generation**: Automatically generates optimized Manim Python code for your animations.
+- **Interactive Interface**: A modern, responsive, and intuitive interface for a seamless user experience.
+- **Light & Dark Modes**: Beautifully designed themes for any lighting condition.
+- **Export & Share**: Download your creations in high quality for presentations, tutorials, or educational content.
 
-```sh
-npx create-turbo@latest
-```
+## 🚀 Live Demo
 
-## What's inside?
+[Experience Animath Live](https://animath.dsingh.fun/)
 
-This Turborepo includes the following packages/apps:
+## 📸 Screenshots
 
-### Apps and Packages
+### Main Interface
+![Animath Main Interface](https://i.imgur.com/your-main-interface-screenshot.png)
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### Explore Page
+![Animath Explore Page](https://i.imgur.com/your-explore-page-screenshot.png)
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### Animation Generation
+![Animath Animation Generation](https://i.imgur.com/your-animation-generation-screenshot.png)
 
-### Utilities
+## 🛠️ Tech Stack
 
-This Turborepo has some additional tools already setup for you:
+- **Frontend**: Next.js, React, TypeScript, Tailwind CSS
+- **Backend**: Node.js, Express, Python, Manim
+- **Real-time Communication**: Socket.IO
+- **Deployment**: Vercel, AWS
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+## 📦 Getting Started
 
-### Build
+### Prerequisites
 
-To build all apps and packages, run the following command:
+- Node.js (v18 or higher)
+- pnpm (or npm/yarn)
+- Python (v3.9 or higher)
+- Manim Community Edition
 
-```
-cd my-turborepo
-pnpm build
-```
+### Installation
 
-### Develop
+1. **Clone the repository:**
+   ```sh
+   git clone https://github.com/DhruvArvindSingh/Animath.git
+   cd Animath
+   ```
 
-To develop all apps and packages, run the following command:
+2. **Install dependencies:**
+   ```sh
+   pnpm install
+   ```
 
-```
-cd my-turborepo
-pnpm dev
-```
+3. **Set up environment variables:**
+   - Create a `.env.local` file in `apps/frontend` and add the necessary API keys and server URLs.
 
-### Remote Caching
+4. **Run the development server:**
+   ```sh
+   pnpm dev
+   ```
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+## 📜 License
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+## 🙏 Acknowledgements
 
-```
-cd my-turborepo
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+- [Manim Community](https://www.manim.community/) for the powerful animation engine.
+- [Next.js](https://nextjs.org/) for the robust frontend framework.
+- [Tailwind CSS](https://tailwindcss.com/) for the utility-first CSS framework.
+- [Vercel](https://vercel.com/) for seamless deployment.
